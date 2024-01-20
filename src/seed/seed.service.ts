@@ -20,22 +20,24 @@ export class SeedService {
 
   async executeSeed() {
 
-    this.pokemonModel.deleteMany({});
+    await this.pokemonModel.deleteMany({});
 
-    let data = await this.http.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=10');
+    let data = await this.http.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=650');
 
-    let pokemonToInsert: { name: string, noPokemon: number }[] = [];
+    let pokemonToInsert: { name: string, no: number }[] = [];
 
     data.results.forEach(({ name, url }) => {
       let segments = url.split('/')
-      let noPokemon: number = +segments[ segments.length - 2 ];      
+      let no: number = +segments[ segments.length - 2 ];      
 
       //let pokemon = await this.pokemonModel.create( { name, noPokemon } );
-      pokemonToInsert.push({ name, noPokemon });
+      pokemonToInsert.push({ name, no });
+     // console.log({ name, noPokemon });
+      
 
     })
 
-    this.pokemonModel.insertMany(pokemonToInsert);
+    await this.pokemonModel.insertMany(pokemonToInsert);
 
     return 'Seed Executed';
   }
