@@ -4,18 +4,21 @@ import { UpdatePokemonDto } from './dto/update-pokemon.dto';
 import { Model, isValidObjectId } from 'mongoose';
 import { Pokemon } from './entities/pokemon.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { log } from 'console';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class PokemonService {
 
+  private defaultLimit: number;
+
   constructor(
 
     @InjectModel( Pokemon.name )
-    private readonly pokemonModel: Model<Pokemon>
+    private readonly pokemonModel: Model<Pokemon>,
+    private readonly configService: ConfigService,
   ) {
-
+      this.defaultLimit = configService.get<number>('defaultÑimit');
   }
 
   async create(createPokemonDto: CreatePokemonDto) {
@@ -24,7 +27,7 @@ export class PokemonService {
     try {
       let pokemon = await this.pokemonModel.create( createPokemonDto );
       return pokemon;
-    } catch (error) {
+    } catch ( error ) {
       this.handleExceptions( error );    
     }
 
@@ -32,10 +35,10 @@ export class PokemonService {
 
   findAll( paginationDtio: PaginationDto ) {
 
-    let { limit = 10, offset = 0 } = paginationDtio;
+    let { limit = this.defaultLimit , offset = 0 } = paginationDtio;
 
     return this.pokemonModel.find()
-      .limit( limit )
+      .limit( +limit )
       .skip( offset )
       .sort({ 
         no: 1
@@ -63,14 +66,14 @@ export class PokemonService {
   }
 
 
-  async update(term: string, updatePokemonDto: UpdatePokemonDto) {
+  async update( term: string, updatePokemonDto: UpdatePokemonDto ) {
     let pokemon = await this.findOne( term );
     if ( updatePokemonDto.name ) {
       updatePokemonDto.name = updatePokemonDto.name.toLocaleLowerCase();
       try {
         await pokemon.updateOne( updatePokemonDto )
         return { ...pokemon.toJSON(), ...updatePokemonDto }        
-      } catch (error) {
+      } catch ( error ) {
         this.handleExceptions( error );
       }      
     }    
