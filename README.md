@@ -16,7 +16,6 @@
 4.- Levantar la base de datos
 ```
   docker-compose up -d
-
 ```
 5.- Clonar el archivo ```.env.template``` y renonbrar la copia a ```.env```
 
@@ -25,12 +24,10 @@
 7.- Ejecutar la aplciación en dev:
 ```
   npm run start:dev
-
 ```
 8.- Reconstruir la Base de Datos con la semilla 
 ```
   http://localhost:3000/api/v2/seed
-
 ```
 
 ## Stack usado
